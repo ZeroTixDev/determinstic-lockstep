@@ -16,18 +16,17 @@
 	let inputTickSent = {};
 	let interpolation = true;
 	let information = true;
-	window.selfId = 'mine';
-	window.mine = {};
+	window.localSelfId = 'other';
+	window.other = {};
 	let polledInputs = [];
 	const poll = () => [...polledInputs]
-	mine.receive = function({ inputs }) {
+	other.receive = function({ inputs }) {
 		inputs.forEach((data) => {
-			if (data.id !== selfId) {
+			if (data.id !== localSelfId) {
 				polledInputs.push(data);
 			}
 		})
 	}
-	
 	let states = [{
 		players: {
 			'mine': {
@@ -64,9 +63,9 @@
 	}
 
 	function render() {
+		// console.log(states, tick);
 		ctx.fillStyle = "rgba(100, 100, 100, 1)";
 		ctx.fillRect(0, 0, canvas.width, canvas.height)
-
 
 		ctx.textAlign = 'center';
 
@@ -86,20 +85,19 @@
 		ctx.font = "25px 'Nunito', Helvetica, Arial"
 		ctx.fillStyle = "rgb(30,30,30)"
 		ctx.beginPath()
-		ctx.arc(states[tick].players[selfId]?.x, states[tick].players[selfId]?.y, 25, 0, Math.PI * 2);
+		ctx.arc(states[tick].players[localSelfId]?.x, states[tick].players[localSelfId]?.y, 25, 0, Math.PI * 2);
 		ctx.fill()
-		ctx.fillText("Client", states[tick].players[selfId]?.x, states[tick].players[selfId]?.y - 35)
+		ctx.fillText("Client", states[tick].players[localSelfId]?.x, states[tick].players[localSelfId]?.y - 35)
 		ctx.fillStyle = "rgb(190,20,20)"
 
 		for (const id of Object.keys(states[tick].players)) {
 			const player = states[tick].players[id];
-			if (id === selfId) continue;
+			if (id === localSelfId) continue;
 			ctx.beginPath()
 			ctx.arc(player?.x, player?.y, 25, 0, Math.PI * 2);
 			ctx.fill()
 			ctx.fillText("Other", player?.x, player?.y - 35)
 		}
-
 
 		// ctx.beginPath()
 		// ctx.arc(otherServer.x, otherServer.y, 25, 0, Math.PI * 2);
@@ -109,7 +107,7 @@
 		ctx.beginPath()
 		// ctx.arc(pos1?.x, pos1?.y, 25, 0, Math.PI * 2);
 		ctx.fill()
-		// ctx.fillText("Server", pos1?.x, (pos1?.y  ?? -500) - 35)
+		// ctx.fillText("Server", pos1?.x, pos1?.y - 35)
 		ctx.fillStyle = "black"
 		ctx.fillText("Tick rate: " + serverTick, canvas.width / 2, 30)
 	}
@@ -121,12 +119,12 @@
 			send({
 					input: input.copy(),
 					tick,
-					id: selfId,
+					id: localSelfId,
 			});
-			inputs[tick].players[selfId] = input.copy()
+			inputs[tick].players[localSelfId] = input.copy()
 		}
 
-		lastInput = input.copy()
+		lastInput = input.copy();
 
 		poll().forEach((data) => {
 			if (inputs[data.tick] === undefined) {
@@ -155,38 +153,38 @@
 	window.addEventListener("keydown", (event) => {
 		if (event.repeat) return;
 		const keyCode = event.keyCode;
-		if (keyCode === 87 ) {
+		if (keyCode === 38) {
 			currentInput.up = true;
-		} else if (keyCode === 83 ) {
+		} else if (keyCode === 40) {
 			currentInput.down = true;
-		} else if (keyCode === 65) {
+		} else if ( keyCode === 37) {
 			currentInput.left = true;
-		} else if (keyCode === 68 ) {
+		} else if (keyCode === 39) {
 			currentInput.right = true;
 		}
 	})
 	window.addEventListener("keyup", (event) => {
 		if (event.repeat) return;
 		const keyCode = event.keyCode;
-		if (keyCode === 87 ) {
+		if (keyCode === 38) {
 			currentInput.up = false;
-		} else if (keyCode === 83) {
+		} else if (keyCode === 40) {
 			currentInput.down = false;
-		} else if (keyCode === 65) {
+		} else if (keyCode === 37) {
 			currentInput.left = false;
-		} else if (keyCode === 68) {
+		} else if (keyCode === 39) {
 			currentInput.right = false;
 		}
-		if (keyCode === 90) {
-			serverTick *= 1.5
-			serverTick = Math.round(serverTick)
-			server.reset()
-		}
-		if (keyCode === 88) {
-			serverTick /= 1.5
-			serverTick = Math.round(serverTick)
-			server.reset()
-		}
+		// if (keyCode === 90) {
+		// 	serverTick *= 1.5
+		// 	serverTick = Math.round(serverTick)
+		// 	server.reset()
+		// }
+		// if (keyCode === 88) {
+		// 	serverTick /= 1.5
+		// 	serverTick = Math.round(serverTick)
+		// 	server.reset()
+		// }
 	})
 	requestAnimationFrame(animate)
 

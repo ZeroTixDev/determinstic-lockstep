@@ -6,12 +6,20 @@ button{
 }
 canvas{
 	border:5px solid black;
+	position: relative;
+	left: 0;
+	top: 0;
 }
 body{
 	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
 }
 *{
 	margin:0;
 	padding:0;
 	box-sizing: border-box;
 }
+
