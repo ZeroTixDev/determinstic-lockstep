@@ -19,7 +19,7 @@ class Server {
 				'other': new Input(),
 			}
 		}];
-		this.lastInput = { players: { 'mine': { tick: 0, input: new Input() }, 'other': { tick: 0, input: new Input() }}};
+		// this.lastInput = { players: { 'mine': { tick: 0, input: new Input() }, 'other': { tick: 0, input: new Input() }}};
 		this.startTime = window.performance.now();
 		this.minTick = 0;
 		this.tick = 0;

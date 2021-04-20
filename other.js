@@ -38,6 +38,17 @@
 			}
 		}
 	}]
+	const renderState = {
+		players: {
+			'mine': {
+				x: 50,
+				y: 50
+			},
+			'other': {
+				x: 100, y: 200,
+			}
+		}
+	}
 	let inputs = [{
 		players: {
 			'mine': new Input(),
@@ -71,27 +82,27 @@
 
 		ctx.fillStyle = 'rgb(0, 150, 0)';
 
-		if (window.server !== undefined) {
+		// if (window.server !== undefined) {
 
-			for (const id of Object.keys(server.states[server.tick].players)) {
-				const player = server.states[server.tick].players[id];
-				ctx.beginPath()
-				ctx.arc(player?.x, player?.y, 25, 0, Math.PI * 2);
-				ctx.fill()
-				// ctx.fillText(id === selfId ? 'Server_Client': 'Server_Other', player?.x, player?.y - 35)
-			}
-		}
+		// 	for (const id of Object.keys(states[tick].players)) {
+		// 		const player = states[tick].players[id];
+		// 		ctx.beginPath()
+		// 		ctx.arc(player?.x, player?.y, 25, 0, Math.PI * 2);
+		// 		ctx.fill()
+		// 		// ctx.fillText(id === selfId ? 'Server_Client': 'Server_Other', player?.x, player?.y - 35)
+		// 	}
+		// }
 
 		ctx.font = "25px 'Nunito', Helvetica, Arial"
 		ctx.fillStyle = "rgb(30,30,30)"
 		ctx.beginPath()
-		ctx.arc(states[tick].players[localSelfId]?.x, states[tick].players[localSelfId]?.y, 25, 0, Math.PI * 2);
+		ctx.arc(renderState.players[localSelfId]?.x, renderState.players[localSelfId]?.y, 25, 0, Math.PI * 2);
 		ctx.fill()
-		ctx.fillText("Client", states[tick].players[localSelfId]?.x, states[tick].players[localSelfId]?.y - 35)
+		ctx.fillText("Client",  renderState.players[localSelfId]?.x, renderState.players[localSelfId]?.y - 35)
 		ctx.fillStyle = "rgb(190,20,20)"
 
-		for (const id of Object.keys(states[tick].players)) {
-			const player = states[tick].players[id];
+		for (const id of Object.keys(renderState.players)) {
+			const player = renderState.players[id];
 			if (id === localSelfId) continue;
 			ctx.beginPath()
 			ctx.arc(player?.x, player?.y, 25, 0, Math.PI * 2);
@@ -110,6 +121,8 @@
 		// ctx.fillText("Server", pos1?.x, pos1?.y - 35)
 		ctx.fillStyle = "black"
 		ctx.fillText("Tick rate: " + serverTick, canvas.width / 2, 30)
+		ctx.fillText("Lag: " + lagRange[1], canvas.width / 2, 60)
+		ctx.fillText("Jitter: " + (lagRange[1] - lagRange[0]), canvas.width / 2, 90)
 	}
 
 	function update() {
@@ -145,6 +158,20 @@
 				inputs[tick + 1] = { players: { } };
 			}
 			tick++;
+		}
+
+
+		const delta = (window.performance.now() - lastTime) / 1000;
+
+		lastTime = window.performance.now();
+		const lerpTime = Math.min(delta * (SIMULATION_STEP_TIME / 2), 1);
+
+		// update render
+		for (const id of Object.keys(renderState.players)) {
+			const player = renderState.players[id];
+			const realPlayer = copy(states[tick].players[id]);
+			player.x = lerp(player.x, realPlayer.x, lerpTime);
+			player.y = lerp(player.y, realPlayer.y, lerpTime);
 		}
 	}
 	function lerp(start, end, time) {

@@ -1,15 +1,16 @@
 const vel = 5;
-const SIMULATION_STEP_TIME = 120;
-const knock = 100;
+const SIMULATION_STEP_TIME = 60;
+const knock = 50;
 const radius = 25;
-const accel = 400;
+const accel = 300;
 const friction = 0.9;
 
 // window.simulate_per_frame = 60;
 // window.buffer = 10;
 window.decay = 1;
-window.lagRange = [25, 300]
-window.serverTick = 30;
+window.lagRange = [25, 100]
+window.serverTick = 60;
+
 
 window.ids = ['mine', 'other']
 
